@@ -34,6 +34,30 @@ async function run() {
 
     const userCollection = client.db("taskCraftDB").collection("users");
 
+    // tasks releted api
+    app.post("/tasks", async (req, res) => {
+      const task = req.body;
+      const result = await tasksCollection.insertOne(task);
+      res.send(result);
+    });
+
+    app.get("/tasks", async (req, res) => {
+      try {
+        const tasks = await tasksCollection.find().toArray();
+        res.status(200).json(tasks);
+      } catch (error) {
+        console.error("Error retrieving tasks:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
+
+    app.get("/tasks/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tasksCollection.findOne(query);
+      res.send(result);
+    });
+
     // // user related API
 
     app.get("/user", async (req, res) => {
