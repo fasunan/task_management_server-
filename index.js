@@ -58,6 +58,65 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/updateTask/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateInfo = req.body;
+      const updateOperation = {
+        $set: {
+          taskTitle: updateInfo.taskTitle,
+          description: updateInfo.description,
+          deadline: updateInfo.deadline,
+          priority: updateInfo.priority,
+        },
+      };
+      const result = await tasksCollection.updateOne(
+        filter,
+        updateOperation,
+        options
+      );
+      res.send(result);
+    });
+
+    app.delete("/tasks/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tasksCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // app.patch("/updateTask/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   try {
+    //     const task = await tasksCollection.findOne(query);
+
+    //     if (!task) {
+    //       return res.status(404).json({ error: "Task not found" });
+    //     }
+    //     const taskUpdateInfo = req.body;
+    //     const updateOperation = {
+    //       $set: {
+    //         taskTitle: taskUpdateInfo.taskTitle,
+    //         description: taskUpdateInfo.description,
+    //         deadline: taskUpdateInfo.deadline,
+    //         priority: taskUpdateInfo.priority,
+    //       },
+    //     };
+    //     const result = await tasksCollection.updateOne(query, updateOperation);
+
+    //     if (result.modifiedCount > 0) {
+    //       res.json({ success: true, message: "Task updated successfully" });
+    //     } else {
+    //       res.status(500).json({ error: "Failed to update task" });
+    //     }
+    //   } catch (error) {
+    //     console.error("Error updating task:", error);
+    //     res.status(500).json({ error: "Internal Server Error" });
+    //   }
+    // });
+
     // // user related API
 
     app.get("/user", async (req, res) => {
